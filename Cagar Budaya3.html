@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eksplorasi Cagar Budaya Kabupaten Batang</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .admin-btn {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .admin-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Main Content */
+        main {
+            min-height: calc(100vh - 200px);
+        }
+
+        .section {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            background: white;
+            margin: 2rem 0;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        /* Map Placeholder */
+        .map-placeholder {
+            height: 400px;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+
+        /* Gallery */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .gallery-item {
+            background: #f8f9fa;
+            height: 200px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 3rem;
+        }
+
+        /* Quiz */
+        .quiz-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 2rem 0;
+        }
+
+        .quiz-question {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .quiz-option {
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .quiz-option:hover {
+            background: #e9ecef;
+        }
+
+        .quiz-option.selected {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 2rem 0;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 0 auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .alert {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">🏛️ Cagar Budaya Batang</div>
+            <ul class="nav-links">
+                <li><a href="#" onclick="showSection('dashboard')">Dashboard</a></li>
+                <li><a href="#" onclick="showSection('map')">Peta</a></li>
+                <li><a href="#" onclick="showSection('gallery')">Galeri</a></li>
+                <li><a href="#" onclick="showSection('articles')">Artikel</a></li>
+                <li><a href="#" onclick="showSection('quiz')">Quiz</a></li>
+                <li><a href="#" onclick="showSection('contact')">Kontak</a></li>
+            </ul>
+            <button class="admin-btn" onclick="showAdminLogin()">Admin</button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="hero">
+                <h1>Selamat Datang di Portal Cagar Budaya Batang</h1>
+                <p>Jelajahi kekayaan warisan budaya Kabupaten Batang yang penuh sejarah dan nilai-nilai luhur nenek moyang</p>
+            </div>
+
+            <div class="card-grid">
+                <div class="card">
+                    <h3>📊 Statistik Cagar Budaya</h3>
+                    <p><strong id="totalSites">12</strong> Situs Cagar Budaya</p>
+                    <p><strong>8</strong> Bangunan Bersejarah</p>
+                    <p><strong>4</strong> Situs Arkeologi</p>
+                </div>
+                <div class="card">
+                    <h3>🏛️ Situs Terpopuler</h3>
+                    <p><strong>Masjid Agung Batang</strong></p>
+                    <p>Dibangun pada abad ke-19, merupakan masjid tertua di Batang</p>
+                </div>
+                <div class="card">
+                    <h3>📅 Event Terbaru</h3>
+                    <p><strong>Festival Budaya Batang 2024</strong></p>
+                    <p>Perayaan warisan budaya dengan berbagai pertunjukan tradisional</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🏛️ Daftar Cagar Budaya</h3>
+                <div id="heritageList"></div>
+            </div>
+        </section>
+
+        <!-- Map Section -->
+        <section id="map" class="section">
+            <h2>Peta Lokasi Cagar Budaya</h2>
+            <div class="card">
+                <div id="mapContainer" style="height: 500px; border-radius: 10px; overflow: hidden;"></div>
+            </div>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>📍 Lokasi Utama</h3>
+                    <ul>
+                        <li>Kecamatan Batang - 5 situs</li>
+                        <li>Kecamatan Warungasem - 3 situs</li>
+                        <li>Kecamatan Limpung - 2 situs</li>
+                        <li>Kecamatan Tersono - 2 situs</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>🗺️ Fitur Peta</h3>
+                    <ul>
+                        <li>Klik marker untuk info detail</li>
+                        <li>Zoom in/out untuk melihat area</li>
+                        <li>Drag untuk menggeser peta</li>
+                        <li>Layer satelit tersedia</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section id="gallery" class="section">
+            <h2>Galeri Foto & Video</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item">🏛️</div>
+                <div class="gallery-item">🕌</div>
+                <div class="gallery-item">🏰</div>
+                <div class="gallery-item">⛩️</div>
+                <div class="gallery-item">🏺</div>
+                <div class="gallery-item">📜</div>
+            </div>
+        </section>
+
+        <!-- Articles Section -->
+        <section id="articles" class="section">
+            <h2>Artikel & Berita Budaya</h2>
+            <div id="articlesContainer"></div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section id="quiz" class="section">
+            <h2>Quiz Budaya Batang</h2>
+            <div class="quiz-container">
+                <div id="quizContent">
+                    <div class="quiz-question" id="quizQuestion"></div>
+                    <div class="quiz-options" id="quizOptions"></div>
+                    <button class="btn" onclick="submitQuizAnswer()">Jawab</button>
+                    <button class="btn" onclick="nextQuestion()" id="nextBtn" style="display: none;">Soal Berikutnya</button>
+                </div>
+                <div id="quizResult" style="display: none;">
+                    <h3>Hasil Quiz</h3>
+                    <p id="scoreText"></p>
+                    <button class="btn" onclick="restartQuiz()">Ulangi Quiz</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>💡 Fakta Unik Batang</h3>
+                <ul>
+                    <li>Batang memiliki pelabuhan bersejarah yang pernah menjadi jalur perdagangan penting</li>
+                    <li>Masjid Agung Batang memiliki arsitektur perpaduan Jawa dan Arab</li>
+                    <li>Situs Sigandu menyimpan jejak peradaban kuno di pesisir utara Jawa</li>
+                    <li>Batang memiliki tradisi batik khas dengan motif pesisiran</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section">
+            <h2>Kontak & Feedback</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>📞 Informasi Kontak</h3>
+                    <p><strong>Dinas Kebudayaan Kabupaten Batang</strong></p>
+                    <p>📍 Jl. RA Kartini No. 1, Batang</p>
+                    <p>📞 (0285) 391234</p>
+                    <p>✉️ budaya@batangkab.go.id</p>
+                </div>
+                <div class="card">
+                    <h3>💬 Kirim Feedback</h3>
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label>Nama:</label>
+                            <input type="text" id="contactName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="contactEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Pesan:</label>
+                            <textarea id="contactMessage" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn">Kirim Pesan</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Section -->
+        <section id="admin" class="section">
+            <div class="admin-panel">
+                <h2>Panel Admin - Kelola Konten</h2>
+                
+                <!-- Admin Tabs -->
+                <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <button class="btn" onclick="showAdminTab('heritage')" id="heritageTab">Cagar Budaya</button>
+                        <button class="btn" onclick="showAdminTab('articles')" id="articlesTab">Artikel</button>
+                        <button class="btn" onclick="showAdminTab('quiz')" id="quizTab">Quiz</button>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn" onclick="logoutAdmin()" style="background: #6c757d; font-size: 0.9rem;">🚪 Logout</button>
+                        <button class="btn btn-danger" onclick="resetToDefaultData()" style="font-size: 0.9rem;">🔄 Reset ke Data Awal</button>
+                    </div>
+                </div>
+
+                <!-- Heritage Admin -->
+                <div id="adminHeritage" class="admin-content">
+                    <div style="margin-bottom: 2rem;">
+                        <button class="btn" onclick="showAddForm('heritage')">Tambah Cagar Budaya Baru</button>
+                        <button id="addModeBtn" class="btn" onclick="toggleAddMode()" style="margin-left: 1rem;">📍 Mode Tambah via Peta</button>
+                        <div id="addModeIndicator" style="display: none; background: #28a745; color: white; padding: 0.5rem 1rem; border-radius: 5px; font-size: 0.9rem; margin-top: 1rem;">
+                            🎯 Buka halaman Peta dan klik pada lokasi untuk menambah cagar budaya baru
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nama</th>
+                                <th>Lokasi</th>
+                                <th>Tahun</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="heritageTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Articles Admin -->
+                <div id="adminArticles" class="admin-content" style="display: none;">
+                    <button class="btn" onclick="showAddForm('article')">Tambah Artikel Baru</button>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Judul</th>
+                                <th>Penulis</th>
+                                <th>Tanggal</th>
+                                <th>Kategori</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="articlesTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Quiz Admin -->
+                <div id="adminQuiz" class="admin-content" style="display: none;">
+                    <button class="btn" onclick="showAddForm('quiz')">Tambah Soal Quiz Baru</button>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Pertanyaan</th>
+                                <th>Jawaban Benar</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quizTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Admin Login Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('adminModal')">&times;</span>
+            <h2>Login Admin</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label>Password:</label>
+                    <input type="password" id="adminPassword" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Heritage Modal -->
+    <div id="heritageModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('heritageModal')">&times;</span>
+            <h2 id="heritageModalTitle">Tambah Cagar Budaya</h2>
+            <form id="heritageForm">
+                <div class="form-group">
+                    <label>Nama:</label>
+                    <input type="text" id="heritageName" required>
+                </div>
+                <div class="form-group">
+                    <label>Lokasi:</label>
+                    <input type="text" id="heritageLocation" required>
+                </div>
+                <div class="form-group">
+                    <label>Tahun:</label>
+                    <input type="number" id="heritageYear" required>
+                </div>
+                <div class="form-group">
+                    <label>Deskripsi:</label>
+                    <textarea id="heritageDescription" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Kategori:</label>
+                    <select id="heritageCategory" required>
+                        <option value="">Pilih Kategori</option>
+                        <option value="Bangunan Bersejarah">Bangunan Bersejarah</option>
+                        <option value="Situs Arkeologi">Situs Arkeologi</option>
+                        <option value="Monumen">Monumen</option>
+                        <option value="Tempat Ibadah">Tempat Ibadah</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Latitude:</label>
+                    <input type="number" id="heritageLat" step="any" placeholder="Contoh: -6.9147">
+                </div>
+                <div class="form-group">
+                    <label>Longitude:</label>
+                    <input type="number" id="heritageLng" step="any" placeholder="Contoh: 109.7319">
+                </div>
+                <div class="form-group">
+                    <label>Upload Gambar:</label>
+                    <input type="file" id="heritageImage" accept="image/*">
+                    <div id="imagePreview" style="margin-top: 10px; display: none;">
+                        <img id="previewImg" style="max-width: 200px; max-height: 200px; border-radius: 5px; border: 1px solid #ddd;">
+                    </div>
+                </div>
+                <button type="submit" class="btn">Simpan</button>
+                <button type="button" class="btn" onclick="closeModal('heritageModal')">Batal</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Article Modal -->
+    <div id="articleModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('articleModal')">&times;</span>
+            <h2 id="articleModalTitle">Tambah Artikel</h2>
+            <form id="articleForm">
+                <div class="form-group">
+                    <label>Judul:</label>
+                    <input type="text" id="articleTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Penulis:</label>
+                    <input type="text" id="articleAuthor" required>
+                </div>
+                <div class="form-group">
+                    <label>Tanggal:</label>
+                    <input type="date" id="articleDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Kategori:</label>
+                    <select id="articleCategory" required>
+                        <option value="">Pilih Kategori</option>
+                        <option value="Sejarah">Sejarah</option>
+                        <option value="Arkeologi">Arkeologi</option>
+                        <option value="Pelestarian">Pelestarian</option>
+                        <option value="Budaya">Budaya</option>
+                        <option value="Berita">Berita</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Konten:</label>
+                    <textarea id="articleContent" rows="8" required></textarea>
+                </div>
+                <button type="submit" class="btn">Simpan</button>
+                <button type="button" class="btn" onclick="closeModal('articleModal')">Batal</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Quiz Modal -->
+    <div id="quizModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('quizModal')">&times;</span>
+            <h2 id="quizModalTitle">Tambah Soal Quiz</h2>
+            <form id="quizForm">
+                <div class="form-group">
+                    <label>Pertanyaan:</label>
+                    <textarea id="quizQuestion" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Pilihan A:</label>
+                    <input type="text" id="quizOptionA" required>
+                </div>
+                <div class="form-group">
+                    <label>Pilihan B:</label>
+                    <input type="text" id="quizOptionB" required>
+                </div>
+                <div class="form-group">
+                    <label>Pilihan C:</label>
+                    <input type="text" id="quizOptionC" required>
+                </div>
+                <div class="form-group">
+                    <label>Pilihan D:</label>
+                    <input type="text" id="quizOptionD" required>
+                </div>
+                <div class="form-group">
+                    <label>Jawaban Benar:</label>
+                    <select id="quizCorrect" required>
+                        <option value="">Pilih Jawaban Benar</option>
+                        <option value="0">A</option>
+                        <option value="1">B</option>
+                        <option value="2">C</option>
+                        <option value="3">D</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Penjelasan:</label>
+                    <textarea id="quizExplanation" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn">Simpan</button>
+                <button type="button" class="btn" onclick="closeModal('quizModal')">Batal</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Portal Cagar Budaya Kabupaten Batang. Semua hak dilindungi.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Local Storage Functions
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem('batang_heritage_data', JSON.stringify(heritageData));
+                localStorage.setItem('batang_articles_data', JSON.stringify(articlesData));
+                localStorage.setItem('batang_quiz_data', JSON.stringify(quizQuestions));
+                localStorage.setItem('batang_admin_status', JSON.stringify(isAdmin));
+            } catch (error) {
+                console.warn('Could not save to localStorage:', error);
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const savedHeritage = localStorage.getItem('batang_heritage_data');
+                const savedArticles = localStorage.getItem('batang_articles_data');
+                const savedQuiz = localStorage.getItem('batang_quiz_data');
+                const savedAdminStatus = localStorage.getItem('batang_admin_status');
+
+                if (savedHeritage) {
+                    heritageData = JSON.parse(savedHeritage);
+                }
+                if (savedArticles) {
+                    articlesData = JSON.parse(savedArticles);
+                }
+                if (savedQuiz) {
+                    quizQuestions = JSON.parse(savedQuiz);
+                }
+                if (savedAdminStatus) {
+                    isAdmin = JSON.parse(savedAdminStatus);
+                }
+            } catch (error) {
+                console.warn('Could not load from localStorage, using default data:', error);
+                // Keep default data if localStorage fails
+            }
+        }
+
+        function resetToDefaultData() {
+            if (confirm('Apakah Anda yakin ingin mengembalikan semua data ke pengaturan awal? Semua perubahan akan hilang!')) {
+                localStorage.removeItem('batang_heritage_data');
+                localStorage.removeItem('batang_articles_data');
+                localStorage.removeItem('batang_quiz_data');
+                localStorage.removeItem('batang_admin_status');
+                location.reload();
+            }
+        }
+
+        // Default Data (will be used if localStorage is empty)
+        const defaultHeritageData = [
+            {
+                id: 1,
+                name: "Masjid Agung Batang",
+                location: "Kecamatan Batang",
+                year: 1850,
+                description: "Masjid tertua di Batang dengan arsitektur perpaduan Jawa dan Arab",
+                category: "Tempat Ibadah",
+                lat: -6.9147,
+                lng: 109.7319,
+                image: null
+            },
+            {
+                id: 2,
+                name: "Situs Sigandu",
+                location: "Kecamatan Batang",
+                year: 1400,
+                description: "Situs arkeologi yang menyimpan jejak peradaban kuno",
+                category: "Situs Arkeologi",
+                lat: -6.9200,
+                lng: 109.7250,
+                image: null
+            },
+            {
+                id: 3,
+                name: "Benteng VOC Batang",
+                location: "Kecamatan Batang",
+                year: 1619,
+                description: "Benteng peninggalan masa kolonial Belanda",
+                category: "Bangunan Bersejarah",
+                lat: -6.9100,
+                lng: 109.7400,
+                image: null
+            },
+            {
+                id: 4,
+                name: "Klenteng Hok Lay Kiong",
+                location: "Kecamatan Batang",
+                year: 1870,
+                description: "Klenteng bersejarah dengan arsitektur Tionghoa klasik",
+                category: "Tempat Ibadah",
+                lat: -6.9080,
+                lng: 109.7350,
+                image: null
+            },
+            {
+                id: 5,
+                name: "Makam Kyai Langgeng",
+                location: "Kecamatan Warungasem",
+                year: 1600,
+                description: "Makam tokoh penyebar Islam di Batang",
+                category: "Situs Arkeologi",
+                lat: -6.8950,
+                lng: 109.6800,
+                image: null
+            }
+        ];
+
+        const defaultArticlesData = [
+            {
+                id: 1,
+                title: "Sejarah Masjid Agung Batang",
+                content: "Masjid Agung Batang merupakan salah satu masjid tertua di Jawa Tengah yang dibangun pada abad ke-19. Masjid ini memiliki arsitektur yang memadukan gaya Jawa dan Arab, mencerminkan akulturasi budaya yang terjadi di wilayah pesisir utara Jawa. Pembangunan masjid ini diprakarsai oleh para pedagang Arab yang menetap di Batang untuk berdagang.",
+                author: "Tim Redaksi",
+                date: "2024-01-15",
+                category: "Sejarah"
+            },
+            {
+                id: 2,
+                title: "Penemuan Artefak Baru di Situs Sigandu",
+                content: "Tim arkeolog menemukan artefak berusia ratusan tahun di kawasan Sigandu yang menambah khazanah sejarah Batang. Penemuan ini meliputi pecahan keramik, mata uang kuno, dan perhiasan yang menunjukkan adanya aktivitas perdagangan yang ramai di masa lalu. Situs Sigandu diperkirakan merupakan pelabuhan penting pada masa Kerajaan Majapahit.",
+                author: "Dr. Sari Budaya",
+                date: "2024-01-10",
+                category: "Arkeologi"
+            },
+            {
+                id: 3,
+                title: "Upaya Pelestarian Cagar Budaya Batang",
+                content: "Pemerintah Kabupaten Batang terus berupaya melestarikan warisan budaya melalui berbagai program. Program ini meliputi restorasi bangunan bersejarah, digitalisasi arsip, dan edukasi masyarakat tentang pentingnya menjaga warisan budaya. Kolaborasi dengan berbagai pihak termasuk akademisi dan komunitas budaya menjadi kunci keberhasilan program ini.",
+                author: "Dinas Kebudayaan Batang",
+                date: "2024-01-05",
+                category: "Pelestarian"
+            }
+        ];
+
+        const defaultQuizQuestions = [
+            {
+                id: 1,
+                question: "Kapan Masjid Agung Batang dibangun?",
+                options: ["Abad ke-18", "Abad ke-19", "Abad ke-20", "Abad ke-17"],
+                correct: 1,
+                explanation: "Masjid Agung Batang dibangun pada abad ke-19 oleh para pedagang Arab."
+            },
+            {
+                id: 2,
+                question: "Apa nama situs arkeologi terkenal di Batang?",
+                options: ["Situs Sigandu", "Situs Batujaya", "Situs Trowulan", "Situs Sangiran"],
+                correct: 0,
+                explanation: "Situs Sigandu adalah situs arkeologi terkenal di Batang yang menyimpan jejak peradaban kuno."
+            },
+            {
+                id: 3,
+                question: "Berapa jumlah kecamatan di Kabupaten Batang?",
+                options: ["13", "14", "15", "16"],
+                correct: 2,
+                explanation: "Kabupaten Batang memiliki 15 kecamatan."
+            },
+            {
+                id: 4,
+                question: "Siapa yang membangun Benteng VOC Batang?",
+                options: ["Portugis", "Belanda", "Inggris", "Spanyol"],
+                correct: 1,
+                explanation: "Benteng VOC Batang dibangun oleh Belanda pada masa kolonial."
+            }
+        ];
+
+        // Initialize data from localStorage or use defaults
+        let heritageData = [];
+        let articlesData = [];
+        let quizQuestions = [];
+
+        let isAdmin = false;
+        let editingId = null;
+        let editingType = null; // 'heritage', 'article', or 'quiz'
+        let map = null;
+        let markers = [];
+        let isAddMode = false;
+        let tempMarker = null;
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            
+            if (sectionId === 'dashboard') {
+                renderHeritageList();
+            } else if (sectionId === 'map') {
+                setTimeout(initMap, 100); // Delay to ensure container is visible
+                // Show add mode indicator if active
+                if (isAddMode && isAdmin) {
+                    showMapAddModeIndicator();
+                }
+            } else if (sectionId === 'articles') {
+                renderArticles();
+            } else if (sectionId === 'admin' && !isAdmin) {
+                showAdminLogin();
+                return;
+            } else if (sectionId === 'admin' && isAdmin) {
+                showAdminTab('heritage');
+            } else if (sectionId === 'quiz') {
+                initQuiz();
+            }
+        }
+
+        // Admin Tab Management
+        function showAdminTab(tabType) {
+            // Hide all admin content
+            document.querySelectorAll('.admin-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Show selected content
+            document.getElementById(`admin${tabType.charAt(0).toUpperCase() + tabType.slice(1)}`).style.display = 'block';
+            
+            // Update tab buttons
+            document.querySelectorAll('#heritageTab, #articlesTab, #quizTab').forEach(btn => {
+                btn.style.background = '#667eea';
+            });
+            document.getElementById(`${tabType}Tab`).style.background = '#5a6fd8';
+            
+            // Render appropriate table
+            if (tabType === 'heritage') {
+                renderHeritageTable();
+            } else if (tabType === 'articles') {
+                renderArticlesTable();
+            } else if (tabType === 'quiz') {
+                renderQuizTable();
+            }
+        }
+
+        // Map Functions
+        function initMap() {
+            if (map) {
+                map.remove(); // Remove existing map
+            }
+
+            // Initialize map centered on Batang
+            map = L.map('mapContainer').setView([-6.9147, 109.7319], 12);
+
+            // Add tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Add satellite layer option
+            const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles © Esri'
+            });
+
+            // Layer control
+            const baseMaps = {
+                "Peta Jalan": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }),
+                "Satelit": satelliteLayer
+            };
+
+            L.control.layers(baseMaps).addTo(map);
+
+            // Add markers for heritage sites
+            addHeritageMarkers();
+
+            // Add click event for adding new heritage sites
+            map.on('click', function(e) {
+                if (isAddMode) {
+                    const lat = e.latlng.lat;
+                    const lng = e.latlng.lng;
+                    
+                    // Remove existing temp marker
+                    if (tempMarker) {
+                        map.removeLayer(tempMarker);
+                    }
+                    
+                    // Add temporary marker
+                    tempMarker = L.marker([lat, lng], {
+                        icon: L.icon({
+                            iconUrl: 'data:image/svg+xml;base64,' + btoa(`
+                                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41">
+                                    <path fill="#28a745" stroke="#fff" stroke-width="2" d="M12.5 0C5.6 0 0 5.6 0 12.5c0 12.5 12.5 28.5 12.5 28.5s12.5-16 12.5-28.5C25 5.6 19.4 0 12.5 0z"/>
+                                    <circle fill="#fff" cx="12.5" cy="12.5" r="6"/>
+                                </svg>
+                            `),
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [1, -34]
+                        })
+                    }).addTo(map);
+                    
+                    // Show popup with add button
+                    const popupContent = `
+                        <div style="text-align: center; min-width: 200px;">
+                            <h4 style="color: #28a745; margin-bottom: 10px;">📍 Lokasi Baru</h4>
+                            <p><strong>Koordinat:</strong><br>
+                            Lat: ${lat.toFixed(6)}<br>
+                            Lng: ${lng.toFixed(6)}</p>
+                            <button onclick="addHeritageAtLocation(${lat}, ${lng})" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-top: 10px; width: 100%;">
+                                ➕ Tambah Cagar Budaya di Sini
+                            </button>
+                            <button onclick="cancelAddLocation()" style="background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-top: 5px; width: 100%;">
+                                ❌ Batal
+                            </button>
+                        </div>
+                    `;
+                    
+                    tempMarker.bindPopup(popupContent).openPopup();
+                }
+            });
+        }
+
+        function addHeritageMarkers() {
+            // Clear existing markers
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+
+            // Add markers for each heritage site
+            heritageData.forEach(site => {
+                if (site.lat && site.lng) {
+                    const marker = L.marker([site.lat, site.lng]).addTo(map);
+                    
+                    // Create popup content
+                    const popupContent = `
+                        <div style="min-width: 200px;">
+                            <h3 style="color: #667eea; margin-bottom: 10px;">${site.name}</h3>
+                            <p><strong>Lokasi:</strong> ${site.location}</p>
+                            <p><strong>Tahun:</strong> ${site.year}</p>
+                            <p><strong>Kategori:</strong> ${site.category}</p>
+                            <p style="margin-top: 10px;">${site.description}</p>
+                            <button onclick="viewHeritageDetails(${site.id})" style="background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-top: 10px; width: 100%;">
+                                Lihat Lebih Lanjut
+                            </button>
+                        </div>
+                    `;
+                    
+                    marker.bindPopup(popupContent);
+                    markers.push(marker);
+                }
+            });
+        }
+
+        // Admin Functions
+        function showAdminLogin() {
+            if (isAdmin) {
+                // If already logged in, go directly to admin panel
+                showSection('admin');
+            } else {
+                document.getElementById('adminModal').style.display = 'block';
+            }
+        }
+
+        function logoutAdmin() {
+            if (confirm('Apakah Anda yakin ingin logout dari panel admin?')) {
+                isAdmin = false;
+                saveToLocalStorage();
+                
+                // Update admin button
+                updateAdminButton();
+                
+                // Go back to dashboard
+                showSection('dashboard');
+                alert('Anda telah logout dari panel admin.');
+            }
+        }
+
+        function updateAdminButton() {
+            const adminBtn = document.querySelector('.admin-btn');
+            if (adminBtn) {
+                if (isAdmin) {
+                    adminBtn.innerHTML = 'Admin <span style="font-size: 0.8em; opacity: 0.8;">(Logged In)</span>';
+                    adminBtn.style.background = 'rgba(40, 167, 69, 0.8)';
+                } else {
+                    adminBtn.textContent = 'Admin';
+                    adminBtn.style.background = 'rgba(255,255,255,0.2)';
+                }
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const password = document.getElementById('adminPassword').value;
+            
+            if (password === 'admin123') {
+                isAdmin = true;
+                saveToLocalStorage(); // Save admin status
+                updateAdminButton(); // Update button appearance
+                closeModal('adminModal');
+                showSection('admin');
+                document.getElementById('adminPassword').value = '';
+            } else {
+                alert('Password salah!');
+            }
+        });
+
+        function renderHeritageTable() {
+            const tbody = document.getElementById('heritageTableBody');
+            tbody.innerHTML = '';
+            
+            heritageData.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.location}</td>
+                    <td>${item.year}</td>
+                    <td>
+                        <button class="btn" onclick="editItem('heritage', ${item.id})">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteItem('heritage', ${item.id})">Hapus</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderArticlesTable() {
+            const tbody = document.getElementById('articlesTableBody');
+            tbody.innerHTML = '';
+            
+            articlesData.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.title}</td>
+                    <td>${item.author}</td>
+                    <td>${item.date}</td>
+                    <td>${item.category}</td>
+                    <td>
+                        <button class="btn" onclick="editItem('article', ${item.id})">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteItem('article', ${item.id})">Hapus</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderQuizTable() {
+            const tbody = document.getElementById('quizTableBody');
+            tbody.innerHTML = '';
+            
+            quizQuestions.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.question.substring(0, 50)}...</td>
+                    <td>${item.options[item.correct]}</td>
+                    <td>
+                        <button class="btn" onclick="editItem('quiz', ${item.id})">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteItem('quiz', ${item.id})">Hapus</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function showAddForm(type) {
+            editingId = null;
+            editingType = type;
+            
+            if (type === 'heritage') {
+                document.getElementById('heritageModalTitle').textContent = 'Tambah Cagar Budaya';
+                document.getElementById('heritageForm').reset();
+                document.getElementById('imagePreview').style.display = 'none';
+                document.getElementById('heritageModal').style.display = 'block';
+            } else if (type === 'article') {
+                document.getElementById('articleModalTitle').textContent = 'Tambah Artikel';
+                document.getElementById('articleForm').reset();
+                document.getElementById('articleDate').value = new Date().toISOString().split('T')[0];
+                document.getElementById('articleModal').style.display = 'block';
+            } else if (type === 'quiz') {
+                document.getElementById('quizModalTitle').textContent = 'Tambah Soal Quiz';
+                document.getElementById('quizForm').reset();
+                document.getElementById('quizModal').style.display = 'block';
+            }
+        }
+
+        function editItem(type, id) {
+            editingId = id;
+            editingType = type;
+            
+            if (type === 'heritage') {
+                const item = heritageData.find(h => h.id === id);
+                if (item) {
+                    document.getElementById('heritageModalTitle').textContent = 'Edit Cagar Budaya';
+                    document.getElementById('heritageName').value = item.name;
+                    document.getElementById('heritageLocation').value = item.location;
+                    document.getElementById('heritageYear').value = item.year;
+                    document.getElementById('heritageDescription').value = item.description;
+                    document.getElementById('heritageCategory').value = item.category;
+                    document.getElementById('heritageLat').value = item.lat || '';
+                    document.getElementById('heritageLng').value = item.lng || '';
+                    
+                    // Handle existing image
+                    if (item.image) {
+                        document.getElementById('previewImg').src = item.image;
+                        document.getElementById('imagePreview').style.display = 'block';
+                    } else {
+                        document.getElementById('imagePreview').style.display = 'none';
+                    }
+                    
+                    document.getElementById('heritageModal').style.display = 'block';
+                }
+            } else if (type === 'article') {
+                const item = articlesData.find(a => a.id === id);
+                if (item) {
+                    document.getElementById('articleModalTitle').textContent = 'Edit Artikel';
+                    document.getElementById('articleTitle').value = item.title;
+                    document.getElementById('articleAuthor').value = item.author;
+                    document.getElementById('articleDate').value = item.date;
+                    document.getElementById('articleCategory').value = item.category;
+                    document.getElementById('articleContent').value = item.content;
+                    document.getElementById('articleModal').style.display = 'block';
+                }
+            } else if (type === 'quiz') {
+                const item = quizQuestions.find(q => q.id === id);
+                if (item) {
+                    document.getElementById('quizModalTitle').textContent = 'Edit Soal Quiz';
+                    document.getElementById('quizQuestion').value = item.question;
+                    document.getElementById('quizOptionA').value = item.options[0];
+                    document.getElementById('quizOptionB').value = item.options[1];
+                    document.getElementById('quizOptionC').value = item.options[2];
+                    document.getElementById('quizOptionD').value = item.options[3];
+                    document.getElementById('quizCorrect').value = item.correct;
+                    document.getElementById('quizExplanation').value = item.explanation;
+                    document.getElementById('quizModal').style.display = 'block';
+                }
+            }
+        }
+
+        function deleteItem(type, id) {
+            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                if (type === 'heritage') {
+                    heritageData = heritageData.filter(h => h.id !== id);
+                    renderHeritageTable();
+                    updateTotalSites();
+                    if (map) {
+                        addHeritageMarkers();
+                    }
+                } else if (type === 'article') {
+                    articlesData = articlesData.filter(a => a.id !== id);
+                    renderArticlesTable();
+                    renderArticles();
+                } else if (type === 'quiz') {
+                    quizQuestions = quizQuestions.filter(q => q.id !== id);
+                    renderQuizTable();
+                }
+                saveToLocalStorage(); // Save to localStorage after deletion
+            }
+        }
+
+        // Form Submission Handlers
+        document.getElementById('heritageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('heritageName').value,
+                location: document.getElementById('heritageLocation').value,
+                year: parseInt(document.getElementById('heritageYear').value),
+                description: document.getElementById('heritageDescription').value,
+                category: document.getElementById('heritageCategory').value,
+                lat: parseFloat(document.getElementById('heritageLat').value) || null,
+                lng: parseFloat(document.getElementById('heritageLng').value) || null,
+                image: null
+            };
+
+            // Handle image upload
+            const imageFile = document.getElementById('heritageImage').files[0];
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    formData.image = e.target.result;
+                    saveHeritageData(formData);
+                };
+                reader.readAsDataURL(imageFile);
+            } else {
+                // Keep existing image if editing and no new image uploaded
+                if (editingId) {
+                    const existingItem = heritageData.find(h => h.id === editingId);
+                    formData.image = existingItem.image;
+                }
+                saveHeritageData(formData);
+            }
+        });
+
+        function saveHeritageData(formData) {
+            if (editingId) {
+                const index = heritageData.findIndex(h => h.id === editingId);
+                heritageData[index] = { ...formData, id: editingId };
+            } else {
+                const newId = heritageData.length > 0 ? Math.max(...heritageData.map(h => h.id)) + 1 : 1;
+                heritageData.push({ ...formData, id: newId });
+            }
+
+            saveToLocalStorage(); // Save to localStorage
+            closeModal('heritageModal');
+            renderHeritageTable();
+            renderHeritageList();
+            updateTotalSites();
+            
+            if (map) {
+                addHeritageMarkers();
+            }
+        }
+
+        document.getElementById('articleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                title: document.getElementById('articleTitle').value,
+                author: document.getElementById('articleAuthor').value,
+                date: document.getElementById('articleDate').value,
+                category: document.getElementById('articleCategory').value,
+                content: document.getElementById('articleContent').value
+            };
+
+            if (editingId) {
+                const index = articlesData.findIndex(a => a.id === editingId);
+                articlesData[index] = { ...formData, id: editingId };
+            } else {
+                const newId = articlesData.length > 0 ? Math.max(...articlesData.map(a => a.id)) + 1 : 1;
+                articlesData.push({ ...formData, id: newId });
+            }
+
+            saveToLocalStorage(); // Save to localStorage
+            closeModal('articleModal');
+            renderArticlesTable();
+            renderArticles();
+        });
+
+        document.getElementById('quizForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                question: document.getElementById('quizQuestion').value,
+                options: [
+                    document.getElementById('quizOptionA').value,
+                    document.getElementById('quizOptionB').value,
+                    document.getElementById('quizOptionC').value,
+                    document.getElementById('quizOptionD').value
+                ],
+                correct: parseInt(document.getElementById('quizCorrect').value),
+                explanation: document.getElementById('quizExplanation').value
+            };
+
+            if (editingId) {
+                const index = quizQuestions.findIndex(q => q.id === editingId);
+                quizQuestions[index] = { ...formData, id: editingId };
+            } else {
+                const newId = quizQuestions.length > 0 ? Math.max(...quizQuestions.map(q => q.id)) + 1 : 1;
+                quizQuestions.push({ ...formData, id: newId });
+            }
+
+            saveToLocalStorage(); // Save to localStorage
+            closeModal('quizModal');
+            renderQuizTable();
+        });
+
+        // View Heritage Details Function
+        function viewHeritageDetails(heritageId) {
+            // Switch to dashboard section
+            showSection('dashboard');
+            
+            // Scroll to heritage list and highlight the selected item
+            setTimeout(() => {
+                const heritageList = document.getElementById('heritageList');
+                heritageList.scrollIntoView({ behavior: 'smooth' });
+                
+                // Highlight the selected heritage item
+                const cards = heritageList.querySelectorAll('.card');
+                cards.forEach((card, index) => {
+                    const heritage = heritageData[index];
+                    if (heritage && heritage.id === heritageId) {
+                        card.style.border = '3px solid #667eea';
+                        card.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.3)';
+                        card.style.transform = 'scale(1.02)';
+                        
+                        // Remove highlight after 3 seconds
+                        setTimeout(() => {
+                            card.style.border = '';
+                            card.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                            card.style.transform = '';
+                        }, 3000);
+                    }
+                });
+            }, 300);
+        }
+
+        // Heritage List for Dashboard
+        function renderHeritageList() {
+            const container = document.getElementById('heritageList');
+            container.innerHTML = '';
+            
+            heritageData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.marginBottom = '1rem';
+                card.innerHTML = `
+                    <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                        <div style="flex-shrink: 0;">
+                            ${item.image ? 
+                                `<img src="${item.image}" alt="${item.name}" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;">` : 
+                                `<div style="width: 120px; height: 120px; background: #f8f9fa; border: 2px dashed #dee2e6; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 2rem;">🏛️</div>`
+                            }
+                        </div>
+                        <div style="flex: 1;">
+                            <h4>${item.name}</h4>
+                            <p><strong>Lokasi:</strong> ${item.location}</p>
+                            <p><strong>Tahun:</strong> ${item.year}</p>
+                            <p><strong>Kategori:</strong> ${item.category}</p>
+                            <p>${item.description}</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Articles Rendering
+        function renderArticles() {
+            const container = document.getElementById('articlesContainer');
+            container.innerHTML = '';
+            
+            const cardGrid = document.createElement('div');
+            cardGrid.className = 'card-grid';
+            
+            articlesData.forEach(article => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <h3>${article.title}</h3>
+                    <p>${article.content.substring(0, 150)}...</p>
+                    <div style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: #666;">
+                        <span>📅 ${new Date(article.date).toLocaleDateString('id-ID')}</span>
+                        <span>✍️ ${article.author}</span>
+                        <span style="background: #667eea; color: white; padding: 0.25rem 0.5rem; border-radius: 3px;">${article.category}</span>
+                    </div>
+                `;
+                cardGrid.appendChild(card);
+            });
+            
+            container.appendChild(cardGrid);
+        }
+
+        function updateTotalSites() {
+            document.getElementById('totalSites').textContent = heritageData.length;
+        }
+
+        // Quiz Functions
+        function initQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            selectedAnswer = null;
+            document.getElementById('quizContent').style.display = 'block';
+            document.getElementById('quizResult').style.display = 'none';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = quizQuestions[currentQuestion];
+            document.getElementById('quizQuestion').textContent = `${currentQuestion + 1}. ${question.question}`;
+            
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'quiz-option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            document.getElementById('nextBtn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(index) {
+            document.querySelectorAll('.quiz-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelectorAll('.quiz-option')[index].classList.add('selected');
+            selectedAnswer = index;
+        }
+
+        function submitQuizAnswer() {
+            if (selectedAnswer === null) {
+                alert('Pilih jawaban terlebih dahulu!');
+                return;
+            }
+
+            const question = quizQuestions[currentQuestion];
+            const options = document.querySelectorAll('.quiz-option');
+            
+            // Show correct/incorrect answers
+            options.forEach((option, index) => {
+                if (index === question.correct) {
+                    option.style.background = '#28a745';
+                    option.style.color = 'white';
+                } else if (index === selectedAnswer && selectedAnswer !== question.correct) {
+                    option.style.background = '#dc3545';
+                    option.style.color = 'white';
+                }
+                option.style.pointerEvents = 'none';
+            });
+
+            if (selectedAnswer === question.correct) {
+                score++;
+            }
+
+            // Show explanation
+            const explanationDiv = document.createElement('div');
+            explanationDiv.style.marginTop = '1rem';
+            explanationDiv.style.padding = '1rem';
+            explanationDiv.style.background = '#f8f9fa';
+            explanationDiv.style.borderRadius = '5px';
+            explanationDiv.innerHTML = `<strong>Penjelasan:</strong> ${question.explanation}`;
+            document.getElementById('quizOptions').appendChild(explanationDiv);
+
+            document.getElementById('nextBtn').style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizQuestions.length) {
+                showQuestion();
+            } else {
+                showQuizResult();
+            }
+        }
+
+        function showQuizResult() {
+            document.getElementById('quizContent').style.display = 'none';
+            document.getElementById('quizResult').style.display = 'block';
+            
+            const percentage = (score / quizQuestions.length) * 100;
+            let resultText = `Skor Anda: ${score}/${quizQuestions.length} (${percentage.toFixed(0)}%)`;
+            
+            if (percentage >= 80) {
+                resultText += '\n🎉 Excellent! Anda sangat memahami budaya Batang!';
+            } else if (percentage >= 60) {
+                resultText += '\n👍 Good! Pengetahuan Anda tentang budaya Batang cukup baik!';
+            } else {
+                resultText += '\n📚 Keep Learning! Mari pelajari lebih lanjut tentang budaya Batang!';
+            }
+            
+            document.getElementById('scoreText').textContent = resultText;
+        }
+
+        function restartQuiz() {
+            initQuiz();
+        }
+
+        // Contact Form
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('contactName').value;
+            const email = document.getElementById('contactEmail').value;
+            const message = document.getElementById('contactMessage').value;
+            
+            alert(`Terima kasih ${name}! Pesan Anda telah dikirim. Kami akan segera merespons melalui email ${email}.`);
+            
+            this.reset();
+        });
+
+        // Image preview functionality
+        document.getElementById('heritageImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Initialize data on page load
+        function initializeData() {
+            // Load data from localStorage or use defaults
+            loadFromLocalStorage();
+            
+            // If no data in localStorage, use default data
+            if (heritageData.length === 0) {
+                heritageData = [...defaultHeritageData];
+            }
+            if (articlesData.length === 0) {
+                articlesData = [...defaultArticlesData];
+            }
+            if (quizQuestions.length === 0) {
+                quizQuestions = [...defaultQuizQuestions];
+            }
+            
+            // Save to localStorage if it was empty
+            saveToLocalStorage();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeData();
+            renderHeritageList();
+            renderArticles();
+            updateTotalSites();
+            
+            // Update admin button based on login status
+            updateAdminButton();
+        });
+
+        // Map Add Mode Functions
+        function toggleAddMode() {
+            if (!isAdmin) {
+                alert('Fitur ini hanya tersedia untuk admin!');
+                return;
+            }
+            
+            isAddMode = !isAddMode;
+            const btn = document.getElementById('addModeBtn');
+            const indicator = document.getElementById('addModeIndicator');
+            
+            if (isAddMode) {
+                btn.textContent = '🚫 Keluar dari Mode Tambah';
+                btn.style.background = '#dc3545';
+                indicator.style.display = 'block';
+                indicator.innerHTML = '🎯 Mode aktif! Buka halaman <strong>Peta</strong> dan klik pada lokasi untuk menambah cagar budaya baru';
+                
+                // Change map cursor if map is loaded
+                if (map) {
+                    map.getContainer().style.cursor = 'crosshair';
+                }
+                
+                // Show notification to go to map page
+                alert('Mode tambah aktif! Silakan buka halaman Peta dan klik pada lokasi yang diinginkan.');
+            } else {
+                btn.textContent = '📍 Mode Tambah via Peta';
+                btn.style.background = '#667eea';
+                indicator.style.display = 'none';
+                
+                // Reset map cursor
+                if (map) {
+                    map.getContainer().style.cursor = '';
+                }
+                
+                // Remove temp marker if exists
+                if (tempMarker) {
+                    map.removeLayer(tempMarker);
+                    tempMarker = null;
+                }
+                
+                // Remove map indicator
+                const mapIndicator = document.querySelector('.map-add-indicator');
+                if (mapIndicator) {
+                    mapIndicator.remove();
+                }
+            }
+        }
+
+        function showMapAddModeIndicator() {
+            // Create floating indicator on map page
+            const mapSection = document.getElementById('map');
+            let existingIndicator = mapSection.querySelector('.map-add-indicator');
+            
+            if (!existingIndicator) {
+                const indicator = document.createElement('div');
+                indicator.className = 'map-add-indicator';
+                indicator.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #28a745;
+                    color: white;
+                    padding: 1rem;
+                    border-radius: 10px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                    z-index: 1000;
+                    max-width: 300px;
+                    font-size: 0.9rem;
+                `;
+                indicator.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <span style="font-size: 1.2rem;">🎯</span>
+                        <strong>Mode Tambah Aktif</strong>
+                    </div>
+                    <p style="margin: 0;">Klik pada peta untuk menambah lokasi cagar budaya baru</p>
+                `;
+                mapSection.appendChild(indicator);
+            }
+        }
+
+        function addHeritageAtLocation(lat, lng) {
+            // Store coordinates temporarily
+            window.tempCoordinates = { lat: lat.toFixed(6), lng: lng.toFixed(6) };
+            
+            // Switch to admin section first
+            showSection('admin');
+            
+            // Then open add heritage form with pre-filled coordinates
+            setTimeout(() => {
+                showAddForm('heritage');
+                
+                // Auto-fill coordinates
+                document.getElementById('heritageLat').value = window.tempCoordinates.lat;
+                document.getElementById('heritageLng').value = window.tempCoordinates.lng;
+                
+                // Show success message
+                const coordMessage = document.createElement('div');
+                coordMessage.style.cssText = `
+                    background: #d4edda;
+                    border: 1px solid #c3e6cb;
+                    color: #155724;
+                    padding: 0.75rem;
+                    border-radius: 5px;
+                    margin-bottom: 1rem;
+                `;
+                coordMessage.innerHTML = `
+                    <strong>📍 Koordinat berhasil diambil dari peta!</strong><br>
+                    Latitude: ${window.tempCoordinates.lat}<br>
+                    Longitude: ${window.tempCoordinates.lng}
+                `;
+                
+                // Insert message at the top of the form
+                const form = document.getElementById('heritageForm');
+                form.insertBefore(coordMessage, form.firstChild);
+                
+                // Remove message after 5 seconds
+                setTimeout(() => {
+                    if (coordMessage.parentNode) {
+                        coordMessage.remove();
+                    }
+                }, 5000);
+                
+                // Clear temp coordinates
+                delete window.tempCoordinates;
+            }, 100);
+            
+            // Exit add mode
+            toggleAddMode();
+        }
+
+        function cancelAddLocation() {
+            if (tempMarker) {
+                map.removeLayer(tempMarker);
+                tempMarker = null;
+            }
+            toggleAddMode();
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9753af4c003f8337',t:'MTc1NjIxNTAzNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
